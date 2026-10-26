@@ -37,3 +37,5 @@ footer{color:#abc5c7}
 @media print{body,main{background:white;color:#17383e}.guide-intro{color:#52696e}.quick-help{display:none}}
 
 .app-footer{display:block;margin-top:32px}.disclaimer{padding:18px 20px;border:1px solid #628075;border-left:3px solid #d7bc7c;background:#193a3f;border-radius:9px}.disclaimer strong{font-size:12px;line-height:1.6;color:#f0dcae}.disclaimer p{font-size:11px;line-height:1.8;color:#c1d3d3;margin:8px 0 0}.footer-brand{display:flex;gap:14px;margin-top:18px;font-size:10px;color:#abc5c7}@media(max-width:580px){.disclaimer{padding:16px}.disclaimer p{font-size:12px}}@media print{.disclaimer{background:white;border-color:#687c7a}.disclaimer strong,.disclaimer p,.footer-brand{color:#17383e}}
+
+.guide-card a{color:#166e60;text-decoration:underline;text-underline-offset:3px}
