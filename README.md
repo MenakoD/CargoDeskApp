@@ -20,7 +20,11 @@ If a browser blocks the outer “Print / Save PDF” button when opening downloa
 
 ## Share with your team
 
-For a smartphone team, the recommended next step is a hosted HTTPS link, optionally shared as a QR code. Hosting has not yet been configured for team access. A home-screen web app (PWA) would make repeat access easier and can use the existing offline cache after a first connected visit; installation metadata and icons still need to be added and tested.
+Public app: **https://menakod.github.io/CargoDeskApp/**
+
+Open this link in a browser on another computer, Android phone, or iPhone. On a phone, use the browser’s Add to Home Screen option where available for a convenient shortcut. A full installable PWA experience and physical-phone testing remain future improvements.
+
+Open the app once while online and allow all files to finish loading before relying on its offline cache. Public access does not create shared shipment records; each browser remains independent.
 
 The ZIP remains an offline fallback for desktop users. Send `CargoDesk-Team.zip`; colleagues should extract it and open `index.html`. Each person has an independent workspace; this app does not synchronize forms between people. Print completed documents to PDF to share results. Entries remain while switching sections but may be lost when refreshing or closing the page.
 
@@ -79,7 +83,7 @@ Only app files belong in the team ZIP. Do not include real shipment data, secret
 
 ## Current limitations
 
-The CMR tool offers Save Draft and Load Draft using this browser’s local storage; drafts do not sync to colleagues. Its draft stores form fields, not drawn signatures. There is no shared database, login, collaboration service, or general automatic recovery of document fields after closing or reloading. Weather defaults to Berlin until changed. The original modules contain example shipment values; replace them before producing operational documents. No team-accessible deployment is live. Local-only hosting configuration is excluded from this public repository. GitHub repository access and website access are separate; a private repository alone does not make a GitHub Pages site private.
+The CMR tool offers Save Draft and Load Draft using this browser’s local storage; drafts do not sync to colleagues. Its draft stores form fields, not drawn signatures. There is no shared database, login, collaboration service, or general automatic recovery of document fields after closing or reloading. Weather defaults to Berlin until changed. The original modules contain example shipment values; replace them before producing operational documents. The app is published publicly through GitHub Pages. Local-only Sites configuration is excluded from this public repository. GitHub repository access and website access are separate; a private repository alone does not make a GitHub Pages site private.
 
 ## Source tools
 
@@ -107,3 +111,7 @@ These are suggestions, not implemented features. Shared records would require a 
 The disclaimer is displayed below every app section and repeated in the user guide.
 
 CargoDesk is an unofficial application provided for assistance and learning. It has not been independently validated or certified for operational use. Use it with care and at your own risk. Its calculations, checklists, and generated documents may contain errors, omissions, or outdated information. Verify all inputs and results against current regulations, carrier requirements, and your organization’s procedures before relying on them. The app does not replace qualified professional judgment, required inspections, or official operational approval. You remain responsible for how you use its results.
+
+## GitHub Pages publishing
+
+The repository Pages source is GitHub Actions. `.github/workflows/pages.yml` publishes only `dist/` when app files change on `main`, and can also be run manually from the Actions tab. README and skill files are not part of the website artifact. The public URL is https://menakod.github.io/CargoDeskApp/.
