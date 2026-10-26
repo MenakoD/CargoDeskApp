@@ -1,0 +1,17 @@
+CargoDesk - Export Operations
+
+1. Extract this entire ZIP to a folder.
+2. Open index.html in your browser.
+3. Choose ADR, CMR, or DGR from the sidebar.
+
+The document tools work without internet. Weather needs a connection to refresh.
+Use the print button inside a document to save a PDF.
+CMR Save Draft stores form fields locally, but not drawn signatures.
+Switching sections retains your current entries. Closing or refreshing may lose them.
+Each teammate has an independent copy. Form entries do not sync between people.
+Replace example entries and verify the completed document before operational use.
+
+Send this ZIP through your team's approved file-sharing channel.
+
+DISCLAIMER
+CargoDesk is an unofficial application provided for assistance and learning. It has not been independently validated or certified for operational use. Use it with care and at your own risk. Its calculations, checklists, and generated documents may contain errors, omissions, or outdated information. Verify all inputs and results against current regulations, carrier requirements, and your organization’s procedures before relying on them. The app does not replace qualified professional judgment, required inspections, or official operational approval. You remain responsible for how you use its results.

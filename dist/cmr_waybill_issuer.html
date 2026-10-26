@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMR Waybill Issuer — International Consignment Note</title>
+  <style>
+    :root {
+      --cmr-red: #b91c1c;
+      --cmr-blue: #1d4ed8;
+      --cmr-green: #15803d;
+      --cmr-black: #1e293b;
+      --active-theme: var(--cmr-red);
+      --border-color: #334155;
+      --bg: #f8fafc;
+    }
+
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    body { background-color: var(--bg); margin: 0; padding: 20px; color: #0f172a; }
+
+    .toolbar {
+      max-width: 1050px;
+      margin: 0 auto 20px auto;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 10px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .btn-primary { background: #0f172a; color: white; }
+    .btn-secondary { background: #e2e8f0; color: #1e293b; }
+
+    /* The Main 24-Box CMR Sheet */
+    .cmr-page {
+      max-width: 1050px;
+      margin: 0 auto;
+      background: white;
+      border: 2px solid var(--active-theme);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+
+    .cmr-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--active-theme);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .cmr-title { font-size: 20px; font-weight: 900; color: var(--active-theme); text-transform: uppercase; letter-spacing: 0.5px; }
+    .cmr-copy-indicator { font-size: 13px; font-weight: bold; color: var(--active-theme); text-transform: uppercase; }
+
+    /* Grid Layout for CMR Boxes */
+    .cmr-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      border: 1px solid var(--border-color);
+    }
+
+    .box {
+      border: 1px solid var(--border-color);
+      padding: 6px 8px;
+      position: relative;
+      background: #fff;
+    }
+    .box-num {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--active-theme);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .box-label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    /* Sub-containers within boxes */
+    .box-subgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .badge-sublabel {
+      font-size: 9px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 3px;
+      padding: 4px 6px;
+      font-size: 12px;
+      font-family: inherit;
+    }
+    textarea { resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #3b82f6; background-color: #f8fafc; }
+
+    /* Span utilities */
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+    .col-4 { grid-column: span 4; }
+
+    /* Signature Canvas */
+    .sig-container { margin-top: 4px; }
+    canvas {
+      border: 1px dashed #94a3b8;
+      background: #fafafa;
+      width: 100%;
+      height: 85px;
+      cursor: crosshair;
+    }
+    .sig-actions { display: flex; justify-content: flex-end; margin-top: 2px; }
+    .btn-clear { font-size: 10px; background: none; border: none; color: #ef4444; cursor: pointer; text-decoration: underline; }
+
+    /* Print Formatting */
+    @media print {
+      body { background: white; padding: 0; }
+      .toolbar { display: none !important; }
+      .cmr-page { border: 2px solid var(--active-theme); box-shadow: none; max-width: 100%; padding: 0; }
+      input, textarea { border: none !important; padding: 0 !important; background: transparent !important; }
+      .btn-clear { display: none; }
+      canvas { border: none; background: transparent; }
+    }
+  </style>
+<style>@media screen and (max-width:700px){body{padding:10px}.container{padding:18px 12px;overflow-x:auto}.form-grid,.meta-grid,.signoff-grid{grid-template-columns:1fr 1fr;gap:10px}header{gap:12px;flex-wrap:wrap}h1{font-size:19px}.summary-card{grid-template-columns:1fr}.points-display{border-right:0;padding-right:0}.rules-list{grid-template-columns:1fr}.toolbar{flex-wrap:wrap;gap:12px;padding:12px}.toolbar-group{flex-wrap:wrap}.cmr-page{min-width:760px}.verdict-card{gap:12px;flex-wrap:wrap}table{min-width:620px}input,select,textarea{min-width:0}}@media screen and (max-width:420px){.form-grid,.meta-grid,.signoff-grid{grid-template-columns:1fr}}</style>
+</head>
+<body>
+
+  <!-- Controls Toolbar -->
+  <div class="toolbar no-print">
+    <div class="toolbar-group">
+      <label style="font-size: 13px; font-weight: bold;">CMR Copy Type:</label>
+      <select id="copySelector" onchange="updateTheme(this.value)">
+        <option value="red">Copy 1: Sender (Red)</option>
+        <option value="blue">Copy 2: Consignee (Blue)</option>
+        <option value="green">Copy 3: Carrier (Green)</option>
+        <option value="black">Copy 4: Administration (Black)</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <button class="btn btn-secondary" onclick="saveToStorage()">Save Draft</button>
+      <button class="btn btn-secondary" onclick="loadFromStorage()">Load Draft</button>
+      <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <!-- Main CMR Sheet -->
+  <div class="cmr-page" id="cmrSheet">
+    <div class="cmr-header">
+      <div>
+        <span class="cmr-title">International Consignment Note (CMR)</span>
+        <div style="font-size: 10px; color: #64748b;">Convention on the Contract for the International Carriage of Goods by Road</div>
+      </div>
+      <div class="cmr-copy-indicator" id="copyLabel">Copy 1 · For the Sender</div>
+    </div>
+
+    <div class="cmr-grid">
+      <!-- Box 1 -->
+      <div class="box col-6">
+        <span class="box-num">1</span>
+        <div class="box-label">Sender (Name, Address, Country)</div>
+        <textarea id="box1" rows="4" placeholder="Sender legal name and complete address..."></textarea>
+      </div>
+
+      <!-- Box 16 -->
+      <div class="box col-6">
+        <span class="box-num">16</span>
+        <div class="box-label">Carrier (Name, Address, Country)</div>
+        <textarea id="box16" rows="4" placeholder="Carrier company name, address, license number..."></textarea>
+      </div>
+
+      <!-- Box 2 -->
+      <div class="box col-6">
+        <span class="box-num">2</span>
+        <div class="box-label">Consignee (Name, Address, Country)</div>
+        <textarea id="box2" rows="4" placeholder="Consignee legal name and complete address..."></textarea>
+      </div>
+
+      <!-- Box 17 -->
+      <div class="box col-6">
+        <span class="box-num">17</span>
+        <div class="box-label">Successive Carriers (Name, Address, Country)</div>
+        <textarea id="box17" rows="4" placeholder="If goods are handled by multiple carriers..."></textarea>
+      </div>
+
+      <!-- Box 3 & 4 -->
+      <div class="box col-6">
+        <span class="box-num">3</span>
+        <div class="box-label">Place of Delivery of Goods (Place, Country)</div>
+        <input type="text" id="box3" placeholder="City, Country">
+      </div>
+      <div class="box col-6">
+        <span class="box-num">4</span>
+        <div class="box-label">Place and Date of Taking Over (Place, Country, Date)</div>
+        <input type="text" id="box4" placeholder="City, Country, Date">
+      </div>
+
+      <!-- Box 5 -->
+      <div class="box col-12">
+        <span class="box-num">5</span>
+        <div class="box-label">Documents Attached (e.g., T1/T2 Transit Accompanying Doc, ADR Declaration, Packing List)</div>
+        <input type="text" id="box5" placeholder="e.g., T1 / MRN: 24DE12345678901234, Delivery Note, Security Declaration">
+      </div>
+
+      <!-- Box 6 to 12: Goods Description -->
+      <div class="box col-12">
+        <div class="box-label" style="font-weight: 700;">6–12 Description of Goods (Marks, Numbers, Packages, UN DG Classification)</div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 3fr 1fr 1fr; gap: 8px; margin-bottom: 4px;">
+          <input type="text" id="box6_marks" placeholder="6. Marks and Nos.">
+          <input type="number" id="box7_packages" placeholder="7. Number of packages">
+          <input type="text" id="box9_description" placeholder="9. Nature / Description of goods">
+          <input type="text" id="box11_gross" placeholder="11. Gross weight (kg)">
+          <input type="text" id="box12_volume" placeholder="12. Volume (m³)">
+        </div>
+      </div>
+
+      <!-- Box 13: Sender's Instructions (WITH SEAL & CUSTOMS SECTION) -->
+      <div class="box col-6">
+        <span class="box-num">13</span>
+        <div class="box-label">Sender's Instructions (Customs, Security & Transit)</div>
+        <textarea id="box13" rows="2" placeholder="General handling instructions, temperature requirements, etc..."></textarea>
+
+        <!-- Dedicated Customs & Security Seal Block -->
+        <div class="box-subgrid">
+          <div>
+            <span class="badge-sublabel">🔒 Trailer Seal Number(s)</span>
+            <input type="text" id="box13_seal" placeholder="e.g. SEAL #EU-98765432 / High-Security">
+          </div>
+          <div>
+            <span class="badge-sublabel">📄 Customs T-Doc / MRN</span>
+            <input type="text" id="box13_customs" placeholder="e.g. T1 MRN: 24DE586100...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Box 18: Carrier's Observations (WITH SEAL VERIFICATION) -->
+      <div class="box col-6">
+        <span class="box-num">18</span>
+        <div class="box-label">Carrier's Reservations and Observations on Taking Over</div>
+        <textarea id="box18" rows="2" placeholder="Condition of goods, packaging defects, loading reservations..."></textarea>
+
+        <!-- Driver Verification Check -->
+        <div style="margin-top: 6px;">
+          <span class="badge-sublabel">Verification of Seal Status</span>
+          <input type="text" id="box18_seal_check" placeholder="e.g. Seal checked intact upon departure, seal intact at delivery">
+        </div>
+      </div>
+
+      <!-- Box 14 & 15 -->
+      <div class="box col-6">
+        <span class="box-num">14</span>
+        <div class="box-label">Cash on Delivery (Amount & Currency)</div>
+        <input type="text" id="box14" placeholder="Amount...">
+      </div>
+      <div class="box col-6">
+        <span class="box-num">15</span>
+        <div class="box-label">Special Agreements (e.g., Temperature, Direct Transit)</div>
+        <input type="text" id="box15" placeholder="Special agreements between sender and carrier...">
+      </div>
+
+      <!-- Box 21: Place and Date -->
+      <div class="box col-12">
+        <span class="box-num">21</span>
+        <div class="box-label">Established at / Date</div>
+        <input type="text" id="box21" placeholder="City, Date">
+      </div>
+
+      <!-- Box 22, 23, 24: Signatures -->
+      <div class="box col-4">
+        <span class="box-num">22</span>
+        <div class="box-label">Signature & Stamp of Sender</div>
+        <div class="sig-container">
+          <canvas id="sigSender"></canvas>
+          <div class="sig-actions"><button class="btn-clear no-print" onclick="clearCanvas('sigSender')">Clear</button></div>
+        </div>
+      </div>
+
+      <div class="box col-4">
+        <span class="box-num">23</span>
+        <div class="box-label">Signature & Stamp of Carrier</div>
+        <div class="sig-container">
+          <canvas id="sigCarrier"></canvas>
+          <div class="sig-actions"><button class="btn-clear no-print" onclick="clearCanvas('sigCarrier')">Clear</button></div>
+        </div>
+      </div>
+
+      <div class="box col-4">
+        <span class="box-num">24</span>
+        <div class="box-label">Goods Received: Consignee Signature</div>
+        <div class="sig-container">
+          <canvas id="sigConsignee"></canvas>
+          <div class="sig-actions"><button class="btn-clear no-print" onclick="clearCanvas('sigConsignee')">Clear</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme and copy switching
+    const themes = {
+      red: { color: "#b91c1c", label: "Copy 1 · For the Sender (Red)" },
+      blue: { color: "#1d4ed8", label: "Copy 2 · For the Consignee (Blue)" },
+      green: { color: "#15803d", label: "Copy 3 · For the Carrier (Green)" },
+      black: { color: "#1e293b", label: "Copy 4 · For Administration (Black)" }
+    };
+
+    function updateTheme(key) {
+      const theme = themes[key];
+      document.documentElement.style.setProperty('--active-theme', theme.color);
+      document.getElementById('copyLabel').innerText = theme.label;
+    }
+
+    // Canvas Signature Pad Logic
+    function setupCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
+
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#0f172a';
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches.clientX : e.clientX;
+        const clientY = e.touches ? e.touches.clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+
+      function startDraw(e) { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+      function draw(e) { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+      function stopDraw() { drawing = false; }
+
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      window.addEventListener('mouseup', stopDraw);
+
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', draw, { passive: false });
+      window.addEventListener('touchend', stopDraw);
+    }
+
+    function clearCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // LocalStorage draft persistence (including new seal & customs fields)
+    const fieldIds = [
+      'box1', 'box2', 'box3', 'box4', 'box5',
+      'box6_marks', 'box7_packages', 'box9_description', 'box11_gross', 'box12_volume',
+      'box13', 'box13_seal', 'box13_customs',
+      'box14', 'box15', 'box16', 'box17',
+      'box18', 'box18_seal_check', 'box21'
+    ];
+
+    function saveToStorage() {
+      const data = {};
+      fieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) data[id] = el.value;
+      });
+      localStorage.setItem('cmr_draft', JSON.stringify(data));
+      alert('CMR draft saved to local browser storage.');
+    }
+
+    function loadFromStorage() {
+      const saved = localStorage.getItem('cmr_draft');
+      if (!saved) return alert('No saved draft found.');
+      const data = JSON.parse(saved);
+      fieldIds.forEach(id => {
+        if (data[id] && document.getElementById(id)) {
+          document.getElementById(id).value = data[id];
+        }
+      });
+      alert('CMR draft loaded successfully.');
+    }
+
+    window.onload = function() {
+      setupCanvas('sigSender');
+      setupCanvas('sigCarrier');
+      setupCanvas('sigConsignee');
+      document.getElementById('box21').value = new Date().toLocaleDateString();
+    };
+  </script>
+</body>
+</html>

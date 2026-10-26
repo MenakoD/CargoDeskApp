@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DGR Acceptance Hub — IATA Dangerous Goods Checksheet</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+      --warn: #b45309;
+      --border: #cbd5e1;
+      --bg: #f8fafc;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: #0f172a; margin: 0; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px 30px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+
+    /* Header */
+    header { border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+    h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { color: #64748b; font-size: 13px; margin-top: 4px; }
+
+    /* Verdict Card */
+    .verdict-card { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-radius: 6px; margin-bottom: 25px; border: 2px solid var(--border); }
+    .verdict-card.accepted { background: var(--success-bg); border-color: var(--success); }
+    .verdict-card.rejected { background: var(--danger-bg); border-color: var(--danger); }
+    .verdict-badge { font-size: 18px; font-weight: 900; text-transform: uppercase; }
+    .accepted .verdict-badge { color: var(--success); }
+    .rejected .verdict-badge { color: var(--danger); }
+
+    /* Shipment Meta Form */
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+    .form-group { display: flex; flex-direction: column; }
+    label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px; }
+    input, select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+    input:focus { outline: none; border-color: var(--accent); }
+
+    /* Checklist Table */
+    .section-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--accent); background: #f1f5f9; padding: 8px 12px; margin-top: 20px; border-left: 4px solid var(--accent); }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    th { text-align: left; padding: 8px 10px; font-size: 11px; text-transform: uppercase; background: #fafafa; border-bottom: 1px solid var(--border); }
+    td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; vertical-align: top; }
+    .check-opt { display: flex; gap: 15px; }
+    .check-opt label { font-size: 12px; cursor: pointer; text-transform: none; display: flex; align-items: center; gap: 4px; }
+
+    /* Discrepancy Notice Box (Prints on rejection) */
+    .rejection-box { border: 2px solid var(--danger); background: #fff5f5; padding: 15px; border-radius: 6px; margin-top: 20px; }
+    .rejection-box h3 { margin: 0 0 10px 0; color: var(--danger); font-size: 16px; text-transform: uppercase; }
+    .rejection-list { margin: 0; padding-left: 20px; font-size: 13px; color: var(--danger); }
+
+    /* Sign-off */
+    .signoff-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px; }
+    canvas { border: 1px dashed var(--border); background: #fafafa; width: 100%; height: 75px; cursor: crosshair; }
+
+    /* Buttons */
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-clear { background: none; border: none; color: #ef4444; font-size: 11px; cursor: pointer; text-decoration: underline; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .container { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+      .no-print { display: none !important; }
+      .section-title { background: #eee !important; color: black !important; }
+    }
+  </style>
+<style>@media screen and (max-width:700px){body{padding:10px}.container{padding:18px 12px;overflow-x:auto}.form-grid,.meta-grid,.signoff-grid{grid-template-columns:1fr 1fr;gap:10px}header{gap:12px;flex-wrap:wrap}h1{font-size:19px}.summary-card{grid-template-columns:1fr}.points-display{border-right:0;padding-right:0}.rules-list{grid-template-columns:1fr}.toolbar{flex-wrap:wrap;gap:12px;padding:12px}.toolbar-group{flex-wrap:wrap}.cmr-page{min-width:760px}.verdict-card{gap:12px;flex-wrap:wrap}table{min-width:620px}input,select,textarea{min-width:0}}@media screen and (max-width:420px){.form-grid,.meta-grid,.signoff-grid{grid-template-columns:1fr}}</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>IATA DGR Acceptance Hub</h1>
+      <div class="subtitle">Non-Radioactive Dangerous Goods Acceptance Checklist & Discrepancy Notice</div>
+    </div>
+    <button class="btn btn-primary no-print" onclick="window.print()">Print Report / Notice</button>
+  </header>
+
+  <!-- Live Acceptance Status Banner -->
+  <div class="verdict-card accepted" id="verdictCard">
+    <div>
+      <div class="verdict-badge" id="verdictText">Shipment Accepted</div>
+      <div style="font-size: 12px; margin-top: 3px;" id="verdictSub">All verified criteria comply with IATA DGR and carrier regulations.</div>
+    </div>
+    <div style="text-align: right;">
+      <span style="font-size: 11px; text-transform: uppercase; font-weight: bold; color: #64748b;">Failed Checkpoints</span>
+      <div style="font-size: 24px; font-weight: 900;" id="failCount">0</div>
+    </div>
+  </div>
+
+  <!-- Shipment Header -->
+  <div class="meta-grid">
+    <div class="form-group">
+      <label>Air Waybill (AWB) No.</label>
+      <input type="text" id="awb" placeholder="e.g. 020-12345678">
+    </div>
+    <div class="form-group">
+      <label>Airport of Origin</label>
+      <input type="text" id="origin" placeholder="e.g. FRA / Frankfurt">
+    </div>
+    <div class="form-group">
+      <label>Airport of Destination</label>
+      <input type="text" id="dest" placeholder="e.g. JFK / New York">
+    </div>
+    <div class="form-group">
+      <label>Aircraft Limitation</label>
+      <select id="aircraftType">
+        <option value="PAX">Passenger and Cargo Aircraft</option>
+        <option value="CAO">Cargo Aircraft Only (CAO)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Checklist Form -->
+  <div class="section-title">1. Documentation — Shipper's Declaration for Dangerous Goods (DGD)</div>
+  <table>
+    <thead><tr><th style="width: 70%;">Verification Step</th><th style="width: 30%;">Result</th></tr></thead>
+    <tbody id="sec1">
+      <!-- Injected by JS -->
+    </tbody>
+  </table>
+
+  <div class="section-title">2. Package Marks and Specifications</div>
+  <table>
+    <thead><tr><th style="width: 70%;">Verification Step</th><th style="width: 30%;">Result</th></tr></thead>
+    <tbody id="sec2">
+      <!-- Injected by JS -->
+    </tbody>
+  </table>
+
+  <div class="section-title">3. Package Labelling & Physical Condition</div>
+  <table>
+    <thead><tr><th style="width: 70%;">Verification Step</th><th style="width: 30%;">Result</th></tr></thead>
+    <tbody id="sec3">
+      <!-- Injected by JS -->
+    </tbody>
+  </table>
+
+  <!-- Rejection Summary (Appears only when items fail) -->
+  <div class="rejection-box" id="rejectionSection" style="display: none;">
+    <h3>⚠️ Dangerous Goods Discrepancy & Rejection Notice</h3>
+    <p style="font-size: 12px; margin: 0 0 8px 0;">The consignment cannot be accepted for air transport due to non-compliance with the following IATA DGR requirements:</p>
+    <ul class="rejection-list" id="rejectionList"></ul>
+  </div>
+
+  <!-- Inspector Sign-off -->
+  <div class="signoff-grid">
+    <div>
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Accepting Agent / Qualified DGR Inspector</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+        <input type="text" placeholder="Inspector Name & Employee ID">
+        <input type="text" id="checkDate">
+      </div>
+      <textarea rows="2" placeholder="Inspector remarks / overpack details / dry ice net weight..."></textarea>
+    </div>
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase;">Inspector Signature</span>
+        <button class="btn-clear no-print" onclick="clearCanvas()">Clear</button>
+      </div>
+      <canvas id="inspectorSig"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Standard IATA Acceptance Points
+  const checks = [
+    { sec: "sec1", id: "dgd_copies", text: "Two copies of the Shipper's Declaration completed accurately with red candy-stripe borders." },
+    { sec: "sec1", id: "dgd_airports", text: "Full name and address of Shipper and Consignee, including departure and destination airports." },
+    { sec: "sec1", id: "dgd_aircraft", text: "Passenger and Cargo Aircraft or Cargo Aircraft Only limitation correctly indicated." },
+    { sec: "sec1", id: "dgd_un_seq", text: "UN number, Proper Shipping Name, Class/Division, Subsidiary Risk, and Packing Group in exact order." },
+    { sec: "sec1", id: "dgd_emergency", text: "24-hour emergency response telephone number provided (where required by national or operator variations)." },
+    { sec: "sec1", id: "dgd_signature", text: "Shipper's Declaration signed and dated by the consignor or authorized agent." },
+
+    { sec: "sec2", id: "pkg_un_spec", text: "UN specification packaging markings (e.g. 4G, 1A1) clearly visible, intact, and correct for the PG." },
+    { sec: "sec2", id: "pkg_psn_un", text: "UN number preceded by 'UN' and Proper Shipping Name marked on each individual package." },
+    { sec: "sec2", id: "pkg_names", text: "Full shipper and consignee names and physical addresses marked on packages." },
+
+    { sec: "sec3", id: "lbl_hazard", text: "Primary and subsidiary hazard labels affixed correctly and unobstructed." },
+    { sec: "sec3", id: "lbl_handling", text: "Cargo Aircraft Only (CAO) and/or Package Orientation arrows affixed on two opposite sides." },
+    { sec: "sec3", id: "pkg_condition", text: "Packages in good condition with no visible damage, dents, leakage, or odor." }
+  ];
+
+  function buildChecklist() {
+    checks.forEach(item => {
+      const container = document.getElementById(item.sec);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.text}</td>
+        <td>
+          <div class="check-opt">
+            <label><input type="radio" name="${item.id}" value="PASS" checked onchange="audit()"> Pass</label>
+            <label><input type="radio" name="${item.id}" value="FAIL" onchange="audit()"><span style="color: var(--danger); font-weight: bold;">Fail</span></label>
+            <label><input type="radio" name="${item.id}" value="NA" onchange="audit()"> N/A</label>
+          </div>
+        </td>
+      `;
+      container.appendChild(tr);
+    });
+  }
+
+  function audit() {
+    const failedItems = [];
+    checks.forEach(item => {
+      const val = document.querySelector(`input[name="${item.id}"]:checked`).value;
+      if (val === 'FAIL') {
+        failedItems.push(item.text);
+      }
+    });
+
+    const card = document.getElementById('verdictCard');
+    const verdictText = document.getElementById('verdictText');
+    const verdictSub = document.getElementById('verdictSub');
+    const failCount = document.getElementById('failCount');
+    const rejBox = document.getElementById('rejectionSection');
+    const rejList = document.getElementById('rejectionList');
+
+    failCount.innerText = failedItems.length;
+
+    if (failedItems.length === 0) {
+      card.className = "verdict-card accepted";
+      verdictText.innerText = "Shipment Accepted";
+      verdictSub.innerText = "All verified criteria comply with IATA DGR regulations.";
+      rejBox.style.display = "none";
+    } else {
+      card.className = "verdict-card rejected";
+      verdictText.innerText = "Shipment Rejected";
+      verdictSub.innerText = `Non-compliant. Consignment has ${failedItems.length} safety discrepancy/discrepancies.`;
+      rejBox.style.display = "block";
+      rejList.innerHTML = failedItems.map(f => `<li>${f}</li>`).join('');
+    }
+  }
+
+  // Signature Pad Logic
+  const canvas = document.getElementById('inspectorSig');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  function initCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#0f172a';
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches.clientX : e.clientX;
+      const clientY = e.touches ? e.touches.clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function start(e) { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+    function draw(e) { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+    function stop() { drawing = false; }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', stop);
+
+    canvas.addEventListener('touchstart', start, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    window.addEventListener('touchend', stop);
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  window.onload = function() {
+    buildChecklist();
+    initCanvas();
+    document.getElementById('checkDate').value = new Date().toLocaleDateString();
+  };
+</script>
+</body>
+</html>
