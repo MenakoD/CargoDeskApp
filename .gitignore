@@ -1,0 +1,9 @@
+*.zip
+*.tar.gz
+.DS_Store
+Thumbs.db
+node_modules/
+__pycache__/
+.env
+.env.*
+.validation-deps/
