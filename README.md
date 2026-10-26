@@ -51,7 +51,6 @@ cargo-desk/
     cmr_waybill_issuer.html       CMR module
     dgr_acceptance_hub.html       DGR module
   .agents/skills/cargodesk-development/SKILL.md
-  .openai/hosting.json            Private Sites configuration
   README.md
 ```
 
@@ -80,7 +79,7 @@ Only app files belong in the team ZIP. Do not include real shipment data, secret
 
 ## Current limitations
 
-The CMR tool offers Save Draft and Load Draft using this browser’s local storage; drafts do not sync to colleagues. Its draft stores form fields, not drawn signatures. There is no shared database, login, collaboration service, or general automatic recovery of document fields after closing or reloading. Weather defaults to Berlin until changed. The original modules contain example shipment values; replace them before producing operational documents. No team-accessible deployment is live. The reserved private Sites project is unpublished. GitHub repository access and website access are separate; a private repository alone does not make a GitHub Pages site private.
+The CMR tool offers Save Draft and Load Draft using this browser’s local storage; drafts do not sync to colleagues. Its draft stores form fields, not drawn signatures. There is no shared database, login, collaboration service, or general automatic recovery of document fields after closing or reloading. Weather defaults to Berlin until changed. The original modules contain example shipment values; replace them before producing operational documents. No team-accessible deployment is live. Local-only hosting configuration is excluded from this public repository. GitHub repository access and website access are separate; a private repository alone does not make a GitHub Pages site private.
 
 ## Source tools
 
